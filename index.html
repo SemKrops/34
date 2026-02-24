@@ -1,1 +1,125 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>34 Puzzel</title>
 
+<style>
+body {
+    margin: 0;
+    background: #111;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+}
+
+#game {
+    position: relative;
+    width: 90vw;
+    max-width: 400px;
+    aspect-ratio: 1 / 1;
+    background: #222;
+    border-radius: 20px;
+}
+
+.target {
+    position: absolute;
+    width: 50%;
+    height: 50%;
+    opacity: 0.08;
+}
+
+.piece {
+    position: absolute;
+    width: 50%;
+    height: 50%;
+    background-image: url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'>\
+<text x='50%' y='50%' font-size='260' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='middle'>34</text>\
+</svg>");
+    background-size: 200% 200%;
+    border: 2px solid white;
+    border-radius: 12px;
+    cursor: grab;
+    touch-action: none;
+}
+</style>
+</head>
+
+<body>
+
+<div id="game"></div>
+
+<script>
+const game = document.getElementById("game");
+
+const positions = [
+    {x:0, y:0},
+    {x:50, y:0},
+    {x:0, y:50},
+    {x:50, y:50}
+];
+
+let placedCount = 0;
+
+positions.forEach((pos, index) => {
+    const piece = document.createElement("div");
+    piece.classList.add("piece");
+
+    piece.style.backgroundPosition = 
+        `${index % 2 === 0 ? "0%" : "100%"} ${index < 2 ? "0%" : "100%"}`;
+
+    piece.style.left = Math.random() * 50 + "%";
+    piece.style.top = Math.random() * 50 + "%";
+
+    game.appendChild(piece);
+
+    dragElement(piece, pos);
+});
+
+function dragElement(elmnt, correctPos) {
+    let offsetX = 0, offsetY = 0;
+
+    elmnt.onpointerdown = function(e) {
+        elmnt.setPointerCapture(e.pointerId);
+        offsetX = e.clientX - elmnt.offsetLeft;
+        offsetY = e.clientY - elmnt.offsetTop;
+        elmnt.style.cursor = "grabbing";
+
+        elmnt.onpointermove = function(e) {
+            elmnt.style.left = (e.clientX - offsetX) + "px";
+            elmnt.style.top = (e.clientY - offsetY) + "px";
+        };
+
+        elmnt.onpointerup = function() {
+            elmnt.style.cursor = "grab";
+            elmnt.onpointermove = null;
+
+            const rect = game.getBoundingClientRect();
+            const correctX = rect.width * (correctPos.x / 100);
+            const correctY = rect.height * (correctPos.y / 100);
+
+            if (Math.abs(elmnt.offsetLeft - correctX) < 30 &&
+                Math.abs(elmnt.offsetTop - correctY) < 30) {
+                elmnt.style.left = correctX + "px";
+                elmnt.style.top = correctY + "px";
+                elmnt.style.pointerEvents = "none";
+                placedCount++;
+            }
+
+            if (placedCount === 4) {
+                setTimeout(() => {
+                    alert("Nice 😎 Je hebt 34 compleet gemaakt!");
+                }, 200);
+            }
+        };
+    };
+}
+</script>
+
+</body>
+</html>
