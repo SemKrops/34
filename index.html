@@ -23,10 +23,10 @@ body{
 }
 
 .topbar{
-    display:flex;
-    justify-content:space-between;
+    text-align:center;
     margin-bottom:10px;
     font-weight:bold;
+    font-size:18px;
 }
 
 #game{
@@ -44,11 +44,9 @@ body{
     height:50%;
     cursor:grab;
     touch-action:none;
-    transition:transform .15s ease;
 }
 
 .piece:active{
-    transform:scale(1.05);
     cursor:grabbing;
 }
 
@@ -61,30 +59,6 @@ body{
     inset:0;
     pointer-events:none;
 }
-
-.winOverlay{
-    position:absolute;
-    inset:0;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    background:rgba(0,0,0,0.8);
-    opacity:0;
-    pointer-events:none;
-    transition:.3s;
-}
-
-.winOverlay.show{
-    opacity:1;
-    pointer-events:auto;
-}
-
-.winBox{
-    background:#1c2235;
-    padding:20px;
-    border-radius:15px;
-    text-align:center;
-}
 </style>
 </head>
 <body>
@@ -93,72 +67,61 @@ body{
 
 <div class="wrapper">
 <div class="topbar">
-<div>Tijd: <span id="time">00:00</span></div>
-<div>Score: <span id="score">10000</span></div>
+Tijd: <span id="time">00:00</span>
 </div>
 
-<div id="game">
-<div class="winOverlay" id="win">
-<div class="winBox">
-<h2>🔥 34 Complete!</h2>
-<p id="finalStats"></p>
-<button onclick="resetGame()">Nog een keer</button>
-</div>
-</div>
-</div>
+<div id="game"></div>
 </div>
 
 <script>
-const RED = "#B0002A";
-const TAB = 28;
-const SIZE = 200;
-const RADIUS = 18;
+const RED="#B0002A";
+const TAB=30;
+const SIZE=200;
+const R=18;
 
-let pieces = [];
-let placed = 0;
-let moves = 0;
-let startTime;
-let timerInterval;
+let placed=0;
+let startTime=null;
+let timerInterval=null;
 
-function buildPiecePath(top,right,bottom,left){
-    const mid = SIZE/2;
+function buildPath(top,right,bottom,left){
+const mid=SIZE/2;
 
-    function tab(dir,out){
-        const t = out ? TAB : -TAB;
-        return `c0 ${-20} ${t} ${-20} ${t} 0 c0 20 ${-t} 20 ${-t} 0`;
-    }
+function tab(out){
+const t=out?TAB:-TAB;
+return `c0 -20 ${t} -20 ${t} 0 c0 20 ${-t} 20 ${-t} 0`;
+}
 
-    let d = `M${RADIUS} 0 H${SIZE-RADIUS} Q${SIZE} 0 ${SIZE} ${RADIUS}`;
+let d=`M${R} 0 H${SIZE-R} Q${SIZE} 0 ${SIZE} ${R}`;
 
-    if(right) d += tab("right",right>0);
-    d += `V${SIZE-RADIUS} Q${SIZE} ${SIZE} ${SIZE-RADIUS} ${SIZE}`;
+if(right)d+=tab(right>0);
+d+=`V${SIZE-R} Q${SIZE} ${SIZE} ${SIZE-R} ${SIZE}`;
 
-    if(bottom) d += tab("bottom",bottom>0);
-    d += `H${RADIUS} Q0 ${SIZE} 0 ${SIZE-RADIUS}`;
+if(bottom)d+=tab(bottom>0);
+d+=`H${R} Q0 ${SIZE} 0 ${SIZE-R}`;
 
-    if(left) d += tab("left",left>0);
-    d += `V${RADIUS} Q0 0 ${RADIUS} 0 Z`;
+if(left)d+=tab(left>0);
+d+=`V${R} Q0 0 ${R} 0 Z`;
 
-    return d;
+return d;
 }
 
 const defs=[
-{ id:0, x:0,y:0, edges:[0,1,-1,0] },
-{ id:1, x:200,y:0, edges:[0,0,1,-1] },
-{ id:2, x:0,y:200, edges:[1,-1,0,0] },
-{ id:3, x:200,y:200, edges:[-1,0,0,1] }
+{ id:0,x:0,y:0,edges:[0,1,-1,0] },
+{ id:1,x:200,y:0,edges:[0,0,1,-1] },
+{ id:2,x:0,y:200,edges:[1,-1,0,0] },
+{ id:3,x:200,y:200,edges:[-1,0,0,1] }
 ];
 
 const game=document.getElementById("game");
 
 function createPiece(def){
-    const div=document.createElement("div");
-    div.className="piece";
-    div.dataset.id=def.id;
+const div=document.createElement("div");
+div.className="piece";
+div.dataset.locked="0";
 
-    const path=buildPiecePath(...def.edges);
+const path=buildPath(...def.edges);
 
-    div.innerHTML=`
+div.innerHTML=`
 <svg viewBox="0 0 200 200">
 <defs>
 <clipPath id="clip${def.id}">
@@ -167,7 +130,6 @@ function createPiece(def){
 </defs>
 
 <g clip-path="url(#clip${def.id})">
-<rect width="400" height="400" fill="none"/>
 <text x="${200-def.x}" y="${260-def.y}"
 font-size="260"
 font-weight="900"
@@ -179,84 +141,69 @@ dominant-baseline="middle">34</text>
 <path d="${path}" fill="none" stroke="white" stroke-width="3"/>
 </svg>`;
 
-    div.style.left=Math.random()*200+"px";
-    div.style.top=Math.random()*200+"px";
+div.style.left=Math.random()*200+"px";
+div.style.top=Math.random()*200+"px";
 
-    enableDrag(div,def);
-    game.appendChild(div);
-    pieces.push(div);
+enableDrag(div,def);
+game.appendChild(div);
 }
 
 function enableDrag(el,def){
 let offsetX,offsetY;
-el.onpointerdown=e=>{
-    if(el.classList.contains("locked"))return;
-    el.setPointerCapture(e.pointerId);
-    offsetX=e.clientX-el.offsetLeft;
-    offsetY=e.clientY-el.offsetTop;
-    startGame();
-    el.onpointermove=e=>{
-        el.style.left=(e.clientX-offsetX)+"px";
-        el.style.top=(e.clientY-offsetY)+"px";
-    }
-};
-el.onpointerup=()=>{
-    moves++;
-    const correctX=(def.x/400)*game.clientWidth;
-    const correctY=(def.y/400)*game.clientHeight;
-    if(Math.abs(el.offsetLeft-correctX)<30 &&
-       Math.abs(el.offsetTop-correctY)<30){
-        el.style.left=correctX+"px";
-        el.style.top=correctY+"px";
-        el.classList.add("locked");
-        placed++;
-        if(placed===4) winGame();
-    }
-};
+let dragging=false;
+
+el.addEventListener("pointerdown",e=>{
+if(el.dataset.locked==="1")return;
+dragging=true;
+el.setPointerCapture(e.pointerId);
+offsetX=e.clientX-el.offsetLeft;
+offsetY=e.clientY-el.offsetTop;
+startTimer();
+});
+
+el.addEventListener("pointermove",e=>{
+if(!dragging)return;
+el.style.left=(e.clientX-offsetX)+"px";
+el.style.top=(e.clientY-offsetY)+"px";
+});
+
+el.addEventListener("pointerup",()=>{
+if(!dragging)return;
+dragging=false;
+
+const correctX=(def.x/400)*game.clientWidth;
+const correctY=(def.y/400)*game.clientHeight;
+
+if(Math.abs(el.offsetLeft-correctX)<30 &&
+   Math.abs(el.offsetTop-correctY)<30){
+el.style.left=correctX+"px";
+el.style.top=correctY+"px";
+el.dataset.locked="1";
+placed++;
+if(placed===4) win();
+}
+});
 }
 
-function startGame(){
-if(!startTime){
+function startTimer(){
+if(startTime)return;
 startTime=Date.now();
 timerInterval=setInterval(()=>{
 const t=Date.now()-startTime;
 document.getElementById("time").innerText=
 new Date(t).toISOString().substr(14,5);
-updateScore();
 },100);
 }
-}
 
-function updateScore(){
-const elapsed=(Date.now()-startTime)/1000;
-const score=Math.max(0,10000-elapsed*20-moves*50);
-document.getElementById("score").innerText=Math.floor(score);
-}
-
-function winGame(){
+function win(){
 clearInterval(timerInterval);
 launchConfetti();
-document.getElementById("finalStats").innerText=
-"Tijd: "+document.getElementById("time").innerText+
-" | Score: "+document.getElementById("score").innerText;
-document.getElementById("win").classList.add("show");
-}
-
-function resetGame(){
-pieces.forEach(p=>p.remove());
-pieces=[];
-placed=0;
-moves=0;
-startTime=null;
-document.getElementById("time").innerText="00:00";
-document.getElementById("score").innerText="10000";
-document.getElementById("win").classList.remove("show");
-init();
 }
 
 function init(){
 defs.forEach(createPiece);
 }
+
 init();
 
 /* CONFETTI */
@@ -264,6 +211,8 @@ const canvas=document.getElementById("confetti");
 const ctx=canvas.getContext("2d");
 canvas.width=window.innerWidth;
 canvas.height=window.innerHeight;
+
+let confetti=[];
 
 function launchConfetti(){
 for(let i=0;i<200;i++){
@@ -274,18 +223,17 @@ vy:Math.random()*4+2,
 size:Math.random()*6+4
 });
 }
-animateConfetti();
+animate();
 }
 
-let confetti=[];
-function animateConfetti(){
+function animate(){
 ctx.clearRect(0,0,canvas.width,canvas.height);
 confetti.forEach(p=>{
 p.y+=p.vy;
 ctx.fillStyle=`hsl(${Math.random()*360},100%,50%)`;
 ctx.fillRect(p.x,p.y,p.size,p.size);
 });
-requestAnimationFrame(animateConfetti);
+requestAnimationFrame(animate);
 }
 </script>
 </body>
