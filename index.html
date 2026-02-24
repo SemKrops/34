@@ -179,21 +179,15 @@
     timerInterval = null;
   }
 
-  function buildPath(top,right,bottom,left){
-    function tab(out){
-      const t = out ? TAB : -TAB;
-      return `c0 -20 ${t} -20 ${t} 0 c0 20 ${-t} 20 ${-t} 0`;
-    }
-
-    let d = `M${R} 0 H${SIZE-R} Q${SIZE} 0 ${SIZE} ${R}`;
-    if(right) d += tab(right > 0);
-    d += `V${SIZE-R} Q${SIZE} ${SIZE} ${SIZE-R} ${SIZE}`;
-    if(bottom) d += tab(bottom > 0);
-    d += `H${R} Q0 ${SIZE} 0 ${SIZE-R}`;
-    if(left) d += tab(left > 0);
-    d += `V${R} Q0 0 ${R} 0 Z`;
-    return d;
-  }
+  function buildPath(){
+  return `
+    M0 0
+    H200
+    V200
+    H0
+    Z
+  `;
+}
 
   function gameRect(){ return game.getBoundingClientRect(); }
 
