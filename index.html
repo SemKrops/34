@@ -125,42 +125,63 @@
     pointer-events:none;
     z-index:3;
       /* ===== Kleine start popup ===== */
-  #startPopup{
-  position:fixed;
-  top:50%;
-  left:50%;
-  transform:translate(-50%, -50%);
-  z-index:20;
+  /* ===== Mooie popup in het midden ===== */
+#startPopup{
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 50;
 
-  background: rgba(20,26,40,0.95);
-  border:1px solid rgba(255,255,255,0.2);
-  border-radius:16px;
-  padding:18px 22px;
-  text-align:center;
+  width: min(90vw, 360px);
+  padding: 18px 18px 14px;
 
-  box-shadow:0 20px 60px rgba(0,0,0,0.6);
-  backdrop-filter: blur(6px);
+  background: rgba(20, 26, 40, 0.92);
+  border: 1px solid rgba(255,255,255,0.22);
+  border-radius: 18px;
+
+  box-shadow: 0 22px 70px rgba(0,0,0,0.65);
+  backdrop-filter: blur(10px);
+
+  text-align: center;
+  animation: popupIn 260ms ease-out;
 }
 
-  #startPopup h2{
-  margin:0 0 12px 0;
-  font-size:20px;
+#startPopup h2{
+  margin: 0 0 12px 0;
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 0.2px;
 }
 
-  #startPopup button{
+#startPopup .sub{
+  margin: 0 0 14px 0;
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+#startBtn{
+  width: 100%;
+  border: 0;
+  border-radius: 12px;
+  padding: 10px 14px;
+
   background: var(--red);
-  border:none;
-  padding:8px 16px;
-  border-radius:10px;
-  font-weight:700;
-  color:white;
-  cursor:pointer;
-  }
-
-  #startPopup button:active{
-  transform:translateY(1px);
+  color: white;
+  font-weight: 900;
+  font-size: 16px;
+  cursor: pointer;
 }
-  }
+
+#startBtn:active{
+  transform: translateY(1px);
+}
+
+@keyframes popupIn{
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.96); }
+  to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+  
 </style>
 </head>
 <body>
@@ -170,6 +191,7 @@
   <!-- HIER komt de popup -->
 <div id="startPopup">
   <h2>Maak de 34 weer compleet!</h2>
+  <p class="sub">Klik op Oké om te starten.</p>
   <button id="startBtn">Oké</button>
 </div>
 
