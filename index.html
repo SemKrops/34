@@ -25,86 +25,87 @@
     position:relative;
   }
 
-  /* ===== Logo achtergrond (niet bewegen) ===== */
+  /* ===== Bewegende logo achtergrond (duidelijker) ===== */
   body::before{
     content:"";
     position:fixed;
-    inset:0;
+    inset:-20%;
     pointer-events:none;
     z-index:0;
 
     background-image:url("logo.png");
     background-repeat:repeat;
-    background-size:90px 90px;
-    opacity:0.18;
+    background-size:90px 90px;      /* groter */
+    opacity:0.18;                   /* duidelijker */
+
+    animation:drift1 26s linear infinite;
   }
 
   body::after{
     content:"";
     position:fixed;
-    inset:0;
+    inset:-20%;
     pointer-events:none;
     z-index:0;
 
     background-image:url("logo.png");
     background-repeat:repeat;
-    background-size:140px 140px;
+    background-size:140px 140px;    /* tweede schaal */
     background-position:50px 30px;
     opacity:0.10;
+
+    animation:drift2 42s linear infinite;
   }
 
-  /* ===== Timer altijd duidelijk bovenaan ===== */
+  @keyframes drift1{
+    from { transform: translate3d(0,0,0); }
+    to   { transform: translate3d(-320px,-220px,0); }
+  }
+  @keyframes drift2{
+    from { transform: translate3d(0,0,0); }
+    to   { transform: translate3d(280px,-320px,0); }
+  }
+
+  /* ===== Layout: puzzel groter ===== */
+  .wrapper{
+    width:min(96vw, 1200px);         /* veel groter op desktop */
+    z-index:2;
+  }
+
   .topbar{
-    position:fixed;
-    top:16px;
-    left:50%;
-    transform:translateX(-50%);
-    z-index:5;
-
-    padding:10px 14px;
-    border-radius:14px;
-    background: rgba(7,10,18,0.55);
-    border: 1px solid rgba(255,255,255,0.18);
-    backdrop-filter: blur(10px);
-
-    font-weight:900;
-    font-size:22px;
-    letter-spacing:0.2px;
+    text-align:center;
+    margin-bottom:10px;
+    font-weight:800;
+    font-size:20px;
     text-shadow: 0 2px 16px rgba(0,0,0,0.6);
   }
 
-  /* ===== Layout: puzzel groot ===== */
-  .wrapper{
-    width:min(98vw, 1600px);
-    height:98vh;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center; /* center het spel; timer is fixed */
-    z-index:2;
-  }
-
-  #gameSizer{
-    width:100%;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-  }
-
   #game{
-    position:relative;
+  position:relative;
 
-    width:min(98vw, 96vh, 1500px);
-    height:min(98vw, 96vh, 1500px);
+  /* vul zoveel mogelijk scherm */
+  width:min(96vw, 96vh, 1400px);
+  height:min(96vw, 96vh, 1400px);
 
-    background:var(--panel);
-    border-radius:24px;
-    overflow:hidden;
-    touch-action:none;
-    z-index:2;
-    box-shadow: 0 16px 60px rgba(0,0,0,0.55);
-  }
+  background:var(--panel);
+  border-radius:24px;
+  overflow:hidden;
+  touch-action:none;
+  z-index:2;
+  box-shadow: 0 16px 60px rgba(0,0,0,0.55);
+}
 
+  /* op hele brede screens: hou 'm vierkant en centered */
+ #gameSizer{
+  width:100%;
+  display:flex;
+  justify-content:center;
+}
+
+#game{
+  width:min(96vw, 94vh, 1200px);
+  height:min(96vw, 94vh, 1200px);
+}
   .piece{
     position:absolute;
     width:50%;
@@ -123,22 +124,19 @@
     position:fixed;
     inset:0;
     pointer-events:none;
-    z-index:6; /* boven alles */
-  }
-
-  @media (max-width: 480px){
-    .topbar{ font-size:18px; padding:8px 12px; top:10px; }
+    z-index:3;
   }
 </style>
 </head>
-
 <body>
+
 <canvas id="confetti"></canvas>
 
-<!-- timer fixed -->
-<div class="topbar">Tijd: <span id="time">00:00</span></div>
-
 <div class="wrapper">
+  <div class="topbar">
+    Tijd: <span id="time">00:00</span>
+  </div>
+
   <div id="gameSizer">
     <div id="game"></div>
   </div>
@@ -274,6 +272,7 @@
     let x = e.clientX - drag.offsetX;
     let y = e.clientY - drag.offsetY;
 
+    // keep mostly inside the square
     x = Math.max(-w*0.15, Math.min(r.width - w*0.85, x));
     y = Math.max(-h*0.15, Math.min(r.height - h*0.85, y));
 
@@ -317,7 +316,6 @@
   // confetti
   const canvas = document.getElementById("confetti");
   const ctx = canvas.getContext("2d");
-
   function resize(){
     canvas.width = window.innerWidth * devicePixelRatio;
     canvas.height = window.innerHeight * devicePixelRatio;
@@ -375,6 +373,7 @@
     if(alive) requestAnimationFrame(tickConfetti);
   }
 
+  // init
   defs.forEach(createPiece);
 })();
 </script>
