@@ -124,12 +124,54 @@
     inset:0;
     pointer-events:none;
     z-index:3;
+      /* ===== Kleine start popup ===== */
+  #startPopup{
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%, -50%);
+  z-index:20;
+
+  background: rgba(20,26,40,0.95);
+  border:1px solid rgba(255,255,255,0.2);
+  border-radius:16px;
+  padding:18px 22px;
+  text-align:center;
+
+  box-shadow:0 20px 60px rgba(0,0,0,0.6);
+  backdrop-filter: blur(6px);
+}
+
+  #startPopup h2{
+  margin:0 0 12px 0;
+  font-size:20px;
+}
+
+  #startPopup button{
+  background: var(--red);
+  border:none;
+  padding:8px 16px;
+  border-radius:10px;
+  font-weight:700;
+  color:white;
+  cursor:pointer;
+  }
+
+  #startPopup button:active{
+  transform:translateY(1px);
+}
   }
 </style>
 </head>
 <body>
 
 <canvas id="confetti"></canvas>
+
+  <!-- HIER komt de popup -->
+<div id="startPopup">
+  <h2>Maak de 34 weer compleet!</h2>
+  <button id="startBtn">Oké</button>
+</div>
 
 <div class="wrapper">
  <div class="topbar">
@@ -237,7 +279,7 @@
     randomizePos(el);
 
     el.addEventListener("pointerdown", (e) => {
-      if(el.classList.contains("locked")) return;
+  if(!gameStarted) return;
 
       startTimer();
       el.classList.add("dragging");
@@ -455,6 +497,11 @@
 
   // init
   defs.forEach(createPiece);
+  const popup = document.getElementById("startPopup");
+document.getElementById("startBtn").addEventListener("click", () => {
+  gameStarted = true;
+  popup.style.display = "none";
+});
 })();
 </script>
 
