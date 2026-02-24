@@ -25,87 +25,77 @@
     position:relative;
   }
 
-  /* ===== Bewegende logo achtergrond (duidelijker) ===== */
+  /* ===== Logo achtergrond (NIET bewegen) ===== */
   body::before{
     content:"";
     position:fixed;
-    inset:-20%;
+    inset:0;
     pointer-events:none;
     z-index:0;
 
     background-image:url("logo.png");
     background-repeat:repeat;
-    background-size:90px 90px;      /* groter */
-    opacity:0.18;                   /* duidelijker */
-
-    animation:drift1 26s linear infinite;
+    background-size:90px 90px;
+    opacity:0.18;
   }
 
   body::after{
     content:"";
     position:fixed;
-    inset:-20%;
+    inset:0;
     pointer-events:none;
     z-index:0;
 
     background-image:url("logo.png");
     background-repeat:repeat;
-    background-size:140px 140px;    /* tweede schaal */
+    background-size:140px 140px;
     background-position:50px 30px;
     opacity:0.10;
-
-    animation:drift2 42s linear infinite;
   }
 
-  @keyframes drift1{
-    from { transform: translate3d(0,0,0); }
-    to   { transform: translate3d(-320px,-220px,0); }
-  }
-  @keyframes drift2{
-    from { transform: translate3d(0,0,0); }
-    to   { transform: translate3d(280px,-320px,0); }
-  }
-
-  /* ===== Layout: puzzel groter ===== */
+  /* ===== Layout: puzzel écht groot ===== */
   .wrapper{
-    width:min(96vw, 1200px);         /* veel groter op desktop */
+    width:min(98vw, 1600px);
+    height:98vh;                 /* bijna hele schermhoogte */
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    gap:10px;
     z-index:2;
   }
 
   .topbar{
     text-align:center;
-    margin-bottom:10px;
     font-weight:800;
     font-size:20px;
     text-shadow: 0 2px 16px rgba(0,0,0,0.6);
   }
 
+  /* game neemt vrijwel alle ruimte onder de timer */
+  #gameSizer{
+    flex:1;
+    width:100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+  }
+
   #game{
-  position:relative;
+    position:relative;
 
-  /* vul zoveel mogelijk scherm */
-  width:min(96vw, 96vh, 1400px);
-  height:min(96vw, 96vh, 1400px);
+    /* maximaal groot, maar vierkant */
+    width:min(98vw, 96vh, 1500px);
+    height:min(98vw, 96vh, 1500px);
 
-  background:var(--panel);
-  border-radius:24px;
-  overflow:hidden;
-  touch-action:none;
-  z-index:2;
-  box-shadow: 0 16px 60px rgba(0,0,0,0.55);
-}
+    background:var(--panel);
+    border-radius:24px;
+    overflow:hidden;
+    touch-action:none;
+    z-index:2;
+    box-shadow: 0 16px 60px rgba(0,0,0,0.55);
+  }
 
-  /* op hele brede screens: hou 'm vierkant en centered */
- #gameSizer{
-  width:100%;
-  display:flex;
-  justify-content:center;
-}
-
-#game{
-  width:min(96vw, 94vh, 1200px);
-  height:min(96vw, 94vh, 1200px);
-}
   .piece{
     position:absolute;
     width:50%;
@@ -128,6 +118,7 @@
   }
 </style>
 </head>
+
 <body>
 
 <canvas id="confetti"></canvas>
