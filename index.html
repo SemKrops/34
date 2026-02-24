@@ -133,7 +133,7 @@
 
 <div class="wrapper">
  <div class="topbar">
-  <div>Goed: <span id="placedCount">0</span>/4</div>
+  <div>Aantal goed: <span id="placedCount">0</span>/4</div>
   <div>Tijd: <span id="time">00:00</span></div>
 </div>
 
@@ -158,9 +158,11 @@
 
   const game = document.getElementById("game");
   const timeEl = document.getElementById("time");
+  const placedEl = document.getElementById("placedCount");
 
   let drag = null;
   let placed = 0;
+  placedEl.textContent = placed;
 
   // timer
   let startTime = null;
@@ -292,6 +294,8 @@
       el.style.top  = `${correctY}px`;
       el.classList.add("locked");
       placed++;
+      placedEl.textContent = placed;
+
 
       if(placed === 4){
         stopTimer();
