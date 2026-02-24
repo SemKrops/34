@@ -68,7 +68,7 @@
 
   /* ===== Layout: puzzel groter ===== */
   .wrapper{
-    width:min(92vw, 980px);         /* veel groter op desktop */
+    width:min(96vw, 1200px);         /* veel groter op desktop */
     z-index:2;
   }
 
@@ -81,17 +81,19 @@
   }
 
   #game{
-    position:relative;
-    width:100%;
-    height:min(82vh, 900px);        /* maakt het groot i.p.v. klein vierkant */
-    aspect-ratio:1/1;               /* blijft vierkant waar mogelijk */
-    background:var(--panel);
-    border-radius:24px;
-    overflow:hidden;
-    touch-action:none;
-    z-index:2;
-    box-shadow: 0 16px 60px rgba(0,0,0,0.55);
-  }
+  position:relative;
+
+  /* vul zoveel mogelijk scherm */
+  width:min(96vw, 92vh, 1100px);
+  height:min(96vw, 92vh, 1100px);
+
+  background:var(--panel);
+  border-radius:24px;
+  overflow:hidden;
+  touch-action:none;
+  z-index:2;
+  box-shadow: 0 16px 60px rgba(0,0,0,0.55);
+}
 
   /* op hele brede screens: hou 'm vierkant en centered */
   #gameSizer{
