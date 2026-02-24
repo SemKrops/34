@@ -5,24 +5,53 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>34 Puzzle</title>
 <style>
-  body{
-    margin:0;
-    background:#0e111a;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
-    font-family:Arial, sans-serif;
-    overflow:hidden;
-    color:white;
-  }
-  .wrapper{ width:min(95vw,520px); }
-  .topbar{
-    text-align:center;
-    margin-bottom:10px;
-    font-weight:700;
-    font-size:18px;
-  }
+  /* logo-pattern achtergrond die meebeweegt */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:-1;
+
+  background-image: url("logo.png");
+  background-repeat: repeat;
+  background-size: 64px 64px;     /* grootte van mini-logo’s */
+  background-position: 0 0;
+
+  opacity: 0.14;                  /* subtieler/duidelijker */
+  filter: blur(0.1px);
+
+  animation: logoDrift 18s linear infinite;
+}
+
+/* extra laag voor ‘parallax’ feel (optioneel maar ziet er vet uit) */
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:-1;
+
+  background-image: url("logo.png");
+  background-repeat: repeat;
+  background-size: 92px 92px;     /* tweede schaal */
+  background-position: 40px 20px; /* offset zodat het niet exact overlapt */
+
+  opacity: 0.06;
+  filter: blur(0.2px);
+
+  animation: logoDrift2 32s linear infinite;
+}
+
+@keyframes logoDrift{
+  from { transform: translate3d(0,0,0); }
+  to   { transform: translate3d(-220px, -140px, 0); }
+}
+
+@keyframes logoDrift2{
+  from { transform: translate3d(0,0,0); }
+  to   { transform: translate3d(260px, -200px, 0); }
+}
   #game{
   position:relative;
   width:100%;
