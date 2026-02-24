@@ -177,6 +177,38 @@
   transform: translateY(1px);
 }
 
+#winText{
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0.98);
+  z-index: 60;
+
+  padding: 18px 26px;
+  border-radius: 18px;
+  background: rgba(0,0,0,0.55);
+  border: 1px solid rgba(255,255,255,0.22);
+  backdrop-filter: blur(8px);
+
+  font-weight: 900;
+  letter-spacing: 2px;
+  font-size: clamp(28px, 7vw, 86px);
+  text-align: center;
+
+  opacity: 0;
+  pointer-events: none;
+}
+
+#winText.show{
+  opacity: 1;
+  animation: winPop 320ms ease-out;
+}
+
+@keyframes winPop{
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+  to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
 @keyframes popupIn{
   from { opacity: 0; transform: translate(-50%, -50%) scale(0.96); }
   to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
@@ -193,6 +225,9 @@
   <h2>Maak de 34 weer compleet!</h2>
   <button id="startBtn">Oké</button>
 </div>
+
+<div id="winText">IK ZEG JAAAA</div>
+<div id="winText">Groetjes Sem :)</div>
 
 <div class="wrapper">
  <div class="topbar">
@@ -365,6 +400,7 @@
 
       if(placed === 4){
         stopTimer();
+        document.getElementById("winText").classList.add("show");
         launchConfetti();
       }
     }
